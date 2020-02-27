@@ -264,8 +264,9 @@ train_set %>% dplyr::count(movieId) %>%
   slice(1:10) %>% 
   knitr::kable()
 ```
-  These are noisy estimates that we shoud not trust. Regulirization starts here to penalize large estimates that come from small sample. 
-
+   
+  These are noisy estimates that we shoud not trust. Regulirization starts here to penalize large estimates that come from small sample.
+  
   Lambda is a tuning parameter for regularization studies. This parameter controls the total variability of the movie effect by minimizing an equation that adds a penalty term. When the sample size is big the penalty term is ignored and is ignored. For small sample sizes of ‘bi’, lambda is shrunken to zero. In this section, the plot shows how estimates shrink. 
 ```{r}
 
@@ -276,8 +277,6 @@ mu <- mean(train_set$rating)
 movie_reg_avgs <- train_set %>% 
   group_by(movieId) %>% 
   summarize(b_i = sum(rating - mu)/(n()+lambda), n_i = n()) 
-
-movie_reg_avgs
 
 # plot of regularazied estmates vs lease square estimate
 tibble(original = movie_avgs$b_i, 
@@ -320,7 +319,7 @@ rmse_results <- bind_rows(rmse_results,
 rmse_results %>% knitr::kable()
 ```
 
-  Lambda is a tuning parameter and we can use cross-validation yo choose it
+  Lambda is a tuning parameter and we can use cross-validation to choose it.
 ```{r}
 
 lambdas <- seq(0, 10, 0.25)
@@ -362,7 +361,6 @@ rmses <- sapply(lambdas, function(l){
   return(RMSE(predicted_ratings, test_set$rating))
 })
 
-rmses
 qplot(lambdas, rmses)  
 
 
@@ -377,7 +375,8 @@ rmse_results <- bind_rows(rmse_results,
 rmse_results %>% knitr::kable()
 
 ```
-  We see that that regularized movie model that considered the User Effect gives a smaller RMSE.
+
+We see that that regularized movie model that considered the User Effect gives a smaller RMSE.
 
 ## Results
 
