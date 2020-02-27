@@ -2,11 +2,7 @@
 title: "HarvardX MovieLense Project"
 author: "Khalil Zarifsadr (Kyle Zarif)"
 date: "2/26/2020"
-output:
-  word_document: default
-  pdf_document: default
-  html_document:
-    df_print: paged
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -14,8 +10,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Overview
-Recommender systems are one of the most widespread machine learning applications using by big companies for rating predictions. These systems predict the "rating" a user would give to an item to make specific recommendations. This project generates a movie recommendation system that uses 10M version of the MovieLens dataset. The code to generate the data set is provided by the instructor and is available on the attached Rmd file, and the R script. 
- A machine learning algorithm is trained using the inputs in one subset to predict movie ratings in the validation set. The edx set is used to develop the algorithm and is split into separate training set and test set. Movie ratings are predicted in the validation set as if they were unknown. Residual mean squared error (RMSE) is used to evaluate how close the predictions are to the true values in the validation set. The goal of this project is to fit the best model that minimizes the RMSE. The validation data is not used for training the algorithm and is only used for evaluating the RMSE of the final model.
+
+  Recommender systems are one of the most widespread machine learning applications using by big companies for rating predictions. These systems predict the "rating" a user would give to an item to make specific recommendations. This project generates a movie recommendation system that uses 10M version of the MovieLens dataset. The code to generate the data set is provided by the instructor and is available on the attached Rmd file, and the R script. 
+ 
+  A machine learning algorithm is trained using the inputs in one subset to predict movie ratings in the validation set. The edx set is used to develop the algorithm and is split into separate training set and test set. Movie ratings are predicted in the validation set as if they were unknown. Residual mean squared error (RMSE) is used to evaluate how close the predictions are to the true values in the validation set. The goal of this project is to fit the best model that minimizes the RMSE. The validation data is not used for training the algorithm and is only used for evaluating the RMSE of the final model.
 
 
 ```{r code provided by instructor, include=FALSE}
@@ -92,7 +90,7 @@ library(dplyr)
 
 ## Analysis
 
-The first step is to explore the provided data including the dimensions of the edx and validation sets and checking the available variables. We can see that each row represents a rating given by a user to a movie. In this step the number of unique users and unique movies that were rated is also calculated as following:   
+  The first step is to explore the provided data including the dimensions of the edx and validation sets and checking the available variables. We can see that each row represents a rating given by a user to a movie. In this step the number of unique users and unique movies that were rated is also calculated as following:   
 
 ```{r}
 ##################
@@ -111,7 +109,7 @@ edx %>%
             n_movies = n_distinct(movieId))
 ```
 
-In This project, movie rating predictions will be compared to the true ratings in the validation set using residual mean square error (RMSE). RMSE is a standard way to measure the typical error of a model in predicting quantitative data. RMSE is a kind of (normalized) distance between the vector of predicted values and the vector of observed values. Typical error of more than 1 means a 1-star error for prediction which is a big error. The following function computes RMSE for vectors of ratings and the corresponding predictors. The edx data set is also partitioned into a test set with 20% of the edx data and a train set with 80% of the edx data. The goal of the project is to develop a final model that minimizes RMSE on the test set. The final model will be evaluated on the validation set.     
+  In This project, movie rating predictions will be compared to the true ratings in the validation set using residual mean square error (RMSE). RMSE is a standard way to measure the typical error of a model in predicting quantitative data. RMSE is a kind of (normalized) distance between the vector of predicted values and the vector of observed values. Typical error of more than 1 means a 1-star error for prediction which is a big error. The following function computes RMSE for vectors of ratings and the corresponding predictors. The edx data set is also partitioned into a test set with 20% of the edx data and a train set with 80% of the edx data. The goal of the project is to develop a final model that minimizes RMSE on the test set. The final model will be evaluated on the validation set.     
 ```{r}
 ####################################################################
 # Defining RMSE and Dividing the edx data into training and test set
@@ -128,7 +126,7 @@ test_set <- edx[test_index,]
 
 ```
 
-To make sure we didnt include users and movies in the test set that do not appear in the training set we removed these using:
+  To make sure we didnt include users and movies in the test set that do not appear in the training set we removed these using:
 ```{r}
 test_set <- test_set %>% 
   semi_join(train_set, by = "movieId") %>%
@@ -136,7 +134,7 @@ test_set <- test_set %>%
 
 ```
 
-To implement the first model, we start with a very simple model that considers the same rating regardless of users for all movies. The differences explained by random variability as following:
+  To implement the first model, we start with a very simple model that considers the same rating regardless of users for all movies. The differences explained by random variability as following:
 Yu,i = µ + εu,i
 Where µ is the true rating for all movies and  εu,i denotes independent errors from the same distribution which is centered at zero. The optimum estimate to minimize RMSE is the least square estimate of µ as following: 
 ```{r}
@@ -160,7 +158,8 @@ rmse_results
 
 ```
 
-To optimize the first model, we should consider bs as effects. It is intuitive that some movies are generally rated higher compare to others.  Adding the term 'bi' to represent average ranking for movie ‘i’ can improve the first model as following:
+  To optimize the first model, we should consider bs as effects. It is intuitive that some movies are generally rated higher compare to others.  Adding the term 'bi' to represent average ranking for movie ‘i’ can improve the first model. 'bi' is the average of Yu,i - µ where µ is the average of the true rating for all movies on the training set. The model is as following:
+Yu,i = µ + bi + εu,i
 ```{r}
 #############################
 # Modeling Movie Effects 'bi' 
@@ -188,7 +187,8 @@ rmse_results %>% knitr::kable()   # we see improvement
 
 ```
 
-It is very helpful to consider user effect as an extra bs to the model. Some users are very though while the others like every movie. Some users give a 4 star rating rather than a 2 to a bad movie. User effect can better predict the rating that kind or cranky users grant to movies by adding the term 'bu' as following:     
+  It is very helpful to consider user effect as an extra bs to the model. Some users are very though while the others like every movie. Some users give a 4 star rating rather than a 2 to a bad movie. User effect can better predict the rating that kind or cranky users grant to movies by adding the term 'bu' and this model is as following:
+Yu,i = µ + bi + bu + εu,i
 ```{r}
 #################################################
 # Considering user effect by adding the term 'bu' 
@@ -212,7 +212,7 @@ rmse_results %>% knitr::kable()   # we see improvement
 
 ```
 
-It is possible to further improve the model by considering regularization. By exploring the data in the following section, we see some movies are rated only one or few times while others are rated thousands of times. Thus, it is very critical to constrain the total variability of effect sizes. When there is a small size, regularization puts a penalty term to large estimates that are formed from small sample sizes. 
+  It is possible to further improve the model by considering regularization. By exploring the data in the following section, we see some movies are rated only one or few times while others are rated thousands of times. Thus, it is very critical to constrain the total variability of effect sizes. When there is a small size, regularization puts a penalty term to large estimates that are formed from small sample sizes. 
 ```{r}
 ################
 # Regularization 
@@ -264,9 +264,9 @@ train_set %>% dplyr::count(movieId) %>%
   slice(1:10) %>% 
   knitr::kable()
 ```
-These are noisy estimates that we shoud not trust. Regulirization starts here to penalize large estimates that come from small sample. 
+  These are noisy estimates that we shoud not trust. Regulirization starts here to penalize large estimates that come from small sample. 
 
-Lambda is a tuning parameter for regularization studies. This parameter controls the total variability of the movie effect by minimizing an equation that adds a penalty term. When the sample size is big the penalty term is ignored and is ignored. For small sample sizes of ‘bi’, lambda is shrunken to zero. In this section, the plot shows how estimates shrink. 
+  Lambda is a tuning parameter for regularization studies. This parameter controls the total variability of the movie effect by minimizing an equation that adds a penalty term. When the sample size is big the penalty term is ignored and is ignored. For small sample sizes of ‘bi’, lambda is shrunken to zero. In this section, the plot shows how estimates shrink. 
 ```{r}
 
 
@@ -320,7 +320,7 @@ rmse_results <- bind_rows(rmse_results,
 rmse_results %>% knitr::kable()
 ```
 
-Lambda is a tuning parameter and we can use cross-validation yo choose it
+  Lambda is a tuning parameter and we can use cross-validation yo choose it
 ```{r}
 
 lambdas <- seq(0, 10, 0.25)
@@ -377,11 +377,11 @@ rmse_results <- bind_rows(rmse_results,
 rmse_results %>% knitr::kable()
 
 ```
-We see that that regularized movie model that considered the User Effect gives a smaller RMSE.
+  We see that that regularized movie model that considered the User Effect gives a smaller RMSE.
 
 ## Results
 
-In this section the final movie rating predictions will be compared to the true ratings in the validation set using RMSE. The model that minimized RMSE is the regularized model that considered the movie effect. The model used the tuning parameter lambda equal to 4.75 on the test set. Now we fit the final model on the validation set.
+  In this section the final movie rating predictions will be compared to the true ratings in the validation set using RMSE. The model that minimized RMSE is the regularized model that considered the movie effect. The model used the tuning parameter lambda equal to 4.75 on the test set. Now for the final step we fit the final model on the validation set.
 ```{r}
 ##############################################################################
 # Fitting Model on the Validation set using the lambda that minimuzed the RMSE
@@ -408,3 +408,6 @@ RMSE
 
 ```
 
+## Conclusion 
+
+  The first proposed model of movie recommendation systems considers the same rating using the average of all ratings without considering any biases and the final calculated RMSE was 1.05 which is a big number for this project. By considering movie effect ‘bi’ which is the average of Yu,i - µ for movie ‘i’, the RMSE improved to 0.9437. By adding the user effect ‘bu’ to the model as the second effect RMSE improved to 0.8659. The RMSE hiked to 0.8652 by considering regularization and controlling the variability of the data by adding the tuning parameter Lambda. Lambda equal to 4.75 minimized the RMSE. The final movie prediction was compared to the true rating in the validation set and resulted the RMSE of 0.8648 which is an accepted RMSE for this project. The final model is regularized and is not over-fitted. For future work it is recommended to evaluate and test models by adding additional effects like the released year of movies, genres and other possible effects. Also, matrix factorization and studying the Principal Component Analysis (PCA) can reveal other important patterns that can be used for model optimization.  
