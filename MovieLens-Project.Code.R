@@ -66,9 +66,17 @@ library(purrr)
 library(knitr)
 library(dplyr)
 
-################################
-# Unique users and unique movies
-################################
+##################
+# Data Exploration
+##################
+
+# Dimensions of the edx set and test set and checking the variables
+dim(edx)
+dim(validation)
+head(edx)
+head(validation)
+
+# Number of unique users and movies
 edx %>%
   summarize(n_users = n_distinct(userId),
             n_movies = n_distinct(movieId))
